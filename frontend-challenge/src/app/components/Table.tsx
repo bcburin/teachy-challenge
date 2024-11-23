@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 
 type TableProps<T> = {
     columns: Array<keyof T>;
@@ -18,61 +18,76 @@ function Table<T>({
     loading,
 }: TableProps<T>) {
     return (
-        <div>
+        <div className="rounded-lg shadow-md bg-white overflow-hidden">
             {loading ? (
-                <div className="text-center py-4">Loading...</div>
+                <div className="text-center py-6 text-gray-600">Loading...</div>
             ) : (
-                <table className="table-auto w-full border-collapse border border-gray-200">
-                    <thead>
-                        <tr>
-                            {columns.map((column) => (
-                                <th
-                                    key={column as string}
-                                    className="border border-gray-300 px-4 py-2 text-left"
-                                >
-                                    {column as ReactNode}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rows.map((row, rowIndex) => (
-                            <tr key={rowIndex}>
+                <>
+                    <table className="w-full border-collapse">
+                        <thead className="bg-gray-800 text-white">
+                            <tr>
                                 {columns.map((column) => (
-                                    <td
+                                    <th
                                         key={column as string}
-                                        className="border border-gray-300 px-4 py-2"
+                                        className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider"
                                     >
-                                        {row[column] as string | number}
-                                    </td>
+                                        {column}
+                                    </th>
                                 ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+                        </thead>
+                        <tbody>
+                            {rows.map((row, rowIndex) => (
+                                <tr
+                                    key={rowIndex}
+                                    className={`${rowIndex % 2 === 0
+                                            ? "bg-gray-50"
+                                            : "bg-white"
+                                        } hover:bg-gray-100`}
+                                >
+                                    {columns.map((column) => (
+                                        <td
+                                            key={column as string}
+                                            className="px-6 py-4 text-sm text-gray-700"
+                                        >
+                                            {row[column] as string | number}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
 
-            <div className="flex justify-between items-center mt-4">
-                <button
-                    onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
-                >
-                    Previous
-                </button>
-                <span>
-                    Page {currentPage} of {totalPages}
-                </span>
-                <button
-                    onClick={() =>
-                        onPageChange(Math.min(totalPages, currentPage + 1))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
-                >
-                    Next
-                </button>
-            </div>
+                    {/* Pagination */}
+                    <div className="flex justify-end items-center p-4 border-t bg-gray-100">
+                        <div className="flex space-x-2 items-center">
+                            <button
+                                onClick={() =>
+                                    onPageChange(Math.max(1, currentPage - 1))
+                                }
+                                disabled={currentPage === 1}
+                                className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-sm text-gray-600">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                onClick={() =>
+                                    onPageChange(
+                                        Math.min(totalPages, currentPage + 1)
+                                    )
+                                }
+                                disabled={currentPage === totalPages}
+                                className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
