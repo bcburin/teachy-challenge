@@ -12,11 +12,14 @@ const Sidebar = () => {
     ];
 
     return (
-        <nav className="w-64 h-full bg-gray-800 text-white">
-            <ul className="p-4 space-y-2">
+        <nav className="w-64 h-screen bg-gray-800 text-gray-100 ">
+            <ul className="space-y-1">
                 {links.map((link) => (
-                    <li key={link.href}>
-                        <Link href={link.href} className="block p-2 hover:bg-gray-700 rounded">
+                    <li key={link.href} className="group">
+                        <Link
+                            href={link.href}
+                            className="block px-6 py-4 hover:bg-gray-700 transition-colors font-medium uppercase tracking-wider"
+                        >
                             {link.label}
                         </Link>
                     </li>
