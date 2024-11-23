@@ -46,7 +46,7 @@ const PeoplePage = () => {
 
     return (
         <div>
-            <h1 className="text-2xl font-bold mb-4">People</h1>
+            <h1 className="text-2xl font-bold mb-4 text-gray-800">People</h1>
             {people && (
                 <Table
                     columns={columns}
