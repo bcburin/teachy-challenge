@@ -17,7 +17,7 @@ const PeoplePage = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const data = await getAllPeople(currentPage, false);
+                const data = await getAllPeople(currentPage, true);
                 setPeople(data.result);
                 setTotalPages(Math.ceil(data.count / data.result.length));
             } catch (err) {

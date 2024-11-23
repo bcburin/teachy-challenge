@@ -37,7 +37,14 @@ export async function getFilmById(id: number): Promise<Film> {
 export async function getFilmsByUrls(filmUrls: string[]) {
   try {
     const filmPromises = filmUrls.map((filmUrl) => {
-      const filmId = parseInt(filmUrl.split("/").at(-1) ?? "", 10) || 0;
+      const filmId =
+        parseInt(
+          filmUrl
+            .substring(0, filmUrl.length - 1)
+            .split("/")
+            .at(-1) ?? "",
+          10
+        ) || 0;
       return getFilmById(filmId);
     });
 
