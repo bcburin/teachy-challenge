@@ -30,7 +30,6 @@ const PeoplePage = () => {
         fetchData();
     }, [currentPage]);
 
-    if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
     const columns: Array<keyof Person> = [
@@ -55,6 +54,7 @@ const PeoplePage = () => {
                     totalPages={totalPages}
                     currentPage={currentPage}
                     onPageChange={setCurrentPage}
+                    loading={loading}
                 />
             )}
         </div>
