@@ -33,16 +33,14 @@ const VehiclePage = () => {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4 text-gray-800">Vehicles</h1>
-            {vehicles && (
-                <Table
-                    columns={columns}
-                    rows={vehicles}
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                    loading={loading}
-                />
-            )}
+            <Table
+                columns={columns}
+                rows={vehicles ?? []}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                loading={loading}
+            />
         </div>
     );
 };

@@ -34,16 +34,14 @@ const StarshipPage = () => {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4 text-gray-800">Starships</h1>
-            {starships && (
-                <Table
-                    columns={columns}
-                    rows={starships}
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                    loading={loading}
-                />
-            )}
+            <Table
+                columns={columns}
+                rows={starships ?? []}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                loading={loading}
+            />
         </div>
     );
 };

@@ -30,16 +30,14 @@ const PeoplePage = () => {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4 text-gray-800">People</h1>
-            {people && (
-                <Table
-                    columns={columns}
-                    rows={people}
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                    loading={loading}
-                />
-            )}
+            <Table
+                columns={columns}
+                rows={people ?? []}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                loading={loading}
+            />
         </div>
     );
 };

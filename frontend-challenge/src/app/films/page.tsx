@@ -28,16 +28,14 @@ const FilmPage = () => {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4 text-gray-800">Films</h1>
-            {films && (
-                <Table
-                    columns={columns}
-                    rows={films}
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                    loading={loading}
-                />
-            )}
+            <Table
+                columns={columns}
+                rows={films ?? []}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                loading={loading}
+            />
         </div>
     );
 };

@@ -31,16 +31,14 @@ const PlanetPage = () => {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4 text-gray-800">Planets</h1>
-            {planets && (
-                <Table
-                    columns={columns}
-                    rows={planets}
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                    loading={loading}
-                />
-            )}
+            <Table
+                columns={columns}
+                rows={planets ?? []}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                loading={loading}
+            />
         </div>
     );
 };
