@@ -1,15 +1,17 @@
 "use client";
 
+import React, { useCallback } from "react";
 import Table, { ColumnConfig } from "../components/Table";
 
 import { Person } from "@/app/api/entities/people";
-import React from "react";
 import { getAllPeople } from "@/app/api/entities/people";
 import { usePaginatedData } from "../hooks/usePaginatedData";
 
 const PeoplePage = () => {
+    const fetchPeople = useCallback((page: number) => getAllPeople(page, true), []);
+
     const { data: people, currentPage, totalPages, loading, error, setCurrentPage } = usePaginatedData<Person>(
-        (page) => getAllPeople(page, true)
+        fetchPeople
     );
 
     const columns: ColumnConfig<Person>[] = [

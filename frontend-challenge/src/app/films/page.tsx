@@ -1,15 +1,17 @@
 "use client";
 
+import React, { useCallback } from "react";
 import Table, { ColumnConfig } from "../components/Table";
 
 import { Film } from "@/app/api/entities/films";
-import React from "react";
 import { getAllFilms } from "@/app/api/entities/films";
 import { usePaginatedData } from "../hooks/usePaginatedData";
 
 const FilmPage = () => {
+    const fetchFilms = useCallback(() => getAllFilms(), []);
+
     const { data: films, currentPage, totalPages, loading, error, setCurrentPage } = usePaginatedData<Film>(
-        () => getAllFilms()
+        fetchFilms
     );
 
     const columns: ColumnConfig<Film>[] = [

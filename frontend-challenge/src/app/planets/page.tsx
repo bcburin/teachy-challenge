@@ -1,15 +1,17 @@
 "use client";
 
+import React, { useCallback } from "react";
 import Table, { ColumnConfig } from "../components/Table";
 
 import { Planet } from "@/app/api/entities/planets";
-import React from "react";
 import { getAllPlanets } from "@/app/api/entities/planets";
 import { usePaginatedData } from "../hooks/usePaginatedData";
 
 const PlanetPage = () => {
+    const fetchPlanets = useCallback((page: number) => getAllPlanets(page), [])
+
     const { data: planets, currentPage, totalPages, loading, error, setCurrentPage } = usePaginatedData<Planet>(
-        (page) => getAllPlanets(page)
+        fetchPlanets
     );
 
     const columns: ColumnConfig<Planet>[] = [
