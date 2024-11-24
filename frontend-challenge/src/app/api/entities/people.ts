@@ -1,5 +1,5 @@
 import { Film, getAllFilms } from "./films";
-import { Planet, getAllPlanets } from "./planets";
+import { Planet, getAllPlanetsAllPages } from "./planets";
 import {
   SwapiGetAllResult,
   SwapiPerson,
@@ -73,15 +73,17 @@ export async function getAllPeople(
     `/people/?page=${page}`
   );
   let people = data.results.map((personData) => transformPerson(personData));
+
   if (resolveDeps) {
     const allFilmData = (await getAllFilms()).result;
-    const allPlanetData = (await getAllPlanets()).result;
+    const allPlanetData = await getAllPlanetsAllPages();
     people = people.map(
       (person) =>
         fetchFilmTitlesForPerson(person, allFilmData) &&
         fetchPlanetNamesForPerson(person, allPlanetData)
     );
   }
+
   return {
     result: people,
     count: data.count,

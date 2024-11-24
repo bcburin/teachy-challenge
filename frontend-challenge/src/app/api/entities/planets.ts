@@ -42,12 +42,12 @@ export async function getPlanetById(id: number): Promise<Planet> {
   return transformPlanet(planetData);
 }
 
-export async function getAllPlanets(): Promise<{
+export async function getAllPlanets(page: number): Promise<{
   result: Planet[];
   count: number;
 }> {
   const data = await fetchFromSwapi<SwapiGetAllResult<SwapiPlanet>>(
-    `/planets/`
+    `/planets/?page=${page}`
   );
   const planets = await Promise.all(
     data.results.map((planetData) => transformPlanet(planetData))
@@ -56,4 +56,24 @@ export async function getAllPlanets(): Promise<{
     result: planets,
     count: data.count,
   };
+}
+
+export async function getAllPlanetsAllPages(): Promise<Planet[]> {
+  let currentPage = 1;
+  let allPlanets: Planet[] = [];
+  let totalPlanets = 0;
+
+  do {
+    const { result: planets, count } = await getAllPlanets(currentPage);
+    allPlanets = allPlanets.concat(planets);
+
+    // Determine the total pages based on the first request
+    if (currentPage === 1) {
+      totalPlanets = count;
+    }
+
+    currentPage++;
+  } while (allPlanets.length < totalPlanets);
+
+  return allPlanets;
 }

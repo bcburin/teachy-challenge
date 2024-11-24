@@ -9,7 +9,7 @@ import { usePaginatedData } from "../hooks/usePaginatedData";
 
 const PlanetPage = () => {
     const { data: planets, currentPage, totalPages, loading, error, setCurrentPage } = usePaginatedData<Planet>(
-        () => getAllPlanets()
+        (page) => getAllPlanets(page)
     );
 
     const columns: ColumnConfig<Planet>[] = [
