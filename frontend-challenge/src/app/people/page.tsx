@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Table, { ColumnConfig } from "../components/Table";
 
 import { Person } from "@/app/api/entities/people";
-import Table from "../components/Table";
 import { getAllPeople } from "@/app/api/entities/people";
 
 const PeoplePage = () => {
@@ -30,19 +30,19 @@ const PeoplePage = () => {
         fetchData();
     }, [currentPage]);
 
-    if (error) return <div>Error: {error}</div>;
-
-    const columns: Array<keyof Person> = [
-        "name",
-        "birthYear",
-        "gender",
-        "height",
-        "mass",
-        "homeworld",
-        "n_species",
-        "n_starships",
-        "n_vehicles",
+    const columns: ColumnConfig<Person>[] = [
+        { label: "Name", field: "name", width: "20%" },
+        { label: "Birth Year", field: "birthYear", width: "15%" },
+        { label: "Gender", field: "gender", width: "10%" },
+        { label: "Height", field: "height", width: "10%", render: (value) => `${value} cm` },
+        { label: "Mass", field: "mass", width: "10%", render: (value) => `${value} kg` },
+        { label: "Homeworld", field: "homeworld", width: "20%" },
+        { label: "Species", field: "n_species", width: "5%", render: (value) => value || "Unknown" },
+        { label: "Starships", field: "n_starships", width: "5%", render: (value) => value || "0" },
+        { label: "Vehicles", field: "n_vehicles", width: "5%", render: (value) => value || "0" },
     ];
+
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <div>

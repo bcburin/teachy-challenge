@@ -1,7 +1,14 @@
 import React, { ReactNode } from "react";
 
+export type ColumnConfig<T> = {
+    label: string;
+    field: keyof T;
+    width?: string;
+    render?: (value: T[keyof T], row: T) => ReactNode;
+};
+
 type TableProps<T> = {
-    columns: Array<keyof T>;
+    columns: Array<ColumnConfig<T>>;
     rows: T[];
     totalPages: number;
     currentPage: number;
@@ -9,16 +16,17 @@ type TableProps<T> = {
     loading: boolean;
 };
 
-function TableHeader<T>({ columns }: { columns: Array<keyof T> }) {
+function TableHeader<T>({ columns }: { columns: Array<ColumnConfig<T>> }) {
     return (
         <thead className="bg-gray-800 text-white">
             <tr>
                 {columns.map((column) => (
                     <th
-                        key={column as string}
+                        key={column.field as string}
                         className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider"
+                        style={{ width: column.width }}
                     >
-                        {column as ReactNode}
+                        {column.label}
                     </th>
                 ))}
             </tr>
@@ -31,23 +39,25 @@ function TableRow<T>({
     columns,
 }: {
     row: T;
-    columns: Array<keyof T>;
+    columns: Array<ColumnConfig<T>>;
 }) {
     return (
         <tr className="bg-white hover:bg-gray-100 even:bg-gray-50">
             {columns.map((column) => (
                 <td
-                    key={column as string}
+                    key={column.field as string}
                     className="px-6 py-4 text-sm text-gray-700"
                 >
-                    {row[column] as string | number}
+                    {column.render
+                        ? column.render(row[column.field], row)
+                        : (row[column.field] as string | number)}
                 </td>
             ))}
         </tr>
     );
 }
 
-function LoadingRows<T>({ columns }: { columns: Array<keyof T> }) {
+function LoadingRows<T>({ columns }: { columns: Array<ColumnConfig<T>> }) {
     return (
         <>
             {Array.from({ length: 5 }).map((_, index) => (
