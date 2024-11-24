@@ -31,15 +31,14 @@ const PeoplePage = () => {
     }, [currentPage]);
 
     const columns: ColumnConfig<Person>[] = [
-        { label: "Name", field: "name", width: "20%" },
-        { label: "Birth Year", field: "birthYear", width: "15%" },
-        { label: "Gender", field: "gender", width: "10%" },
-        { label: "Height", field: "height", width: "10%", render: (value) => `${value} cm` },
-        { label: "Mass", field: "mass", width: "10%", render: (value) => `${value} kg` },
-        { label: "Homeworld", field: "homeworld", width: "20%" },
-        { label: "Species", field: "n_species", width: "5%", render: (value) => value || "Unknown" },
+        { label: "Name", field: "name", width: "15%" },
+        { label: "Birth Year", field: "birthYear", width: "5%" },
+        { label: "Gender", field: "gender", width: "5%" },
+        { label: "Height", field: "height", width: "5%", render: (value) => `${value} cm` },
+        { label: "Mass", field: "mass", width: "5%", render: (value) => `${value} kg` },
+        { label: "Homeworld", field: "homeworld", width: "10%" },
         { label: "Starships", field: "n_starships", width: "5%", render: (value) => value || "0" },
-        { label: "Vehicles", field: "n_vehicles", width: "5%", render: (value) => value || "0" },
+        { label: "Movies", field: "films", width: "40%", render: (value) => Array.isArray(value) ? value.join(", ") : "None" }
     ];
 
     if (error) return <div>Error: {error}</div>;

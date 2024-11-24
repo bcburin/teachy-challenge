@@ -16,6 +16,7 @@ export interface Film {
   starships: string[];
   vehicles: string[];
   species: string[];
+  swapiUrl: string;
 }
 
 function transformFilm(filmData: SwapiFilm) {
@@ -31,6 +32,7 @@ function transformFilm(filmData: SwapiFilm) {
     starships: filmData.starships,
     vehicles: filmData.vehicles,
     species: filmData.species,
+    swapiUrl: filmData.url,
   };
 
   return transformedFilm;

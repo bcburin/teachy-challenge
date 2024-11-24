@@ -1,4 +1,5 @@
 import { Film, getAllFilms } from "./films";
+import { Planet, getAllPlanets } from "./planets";
 import {
   SwapiGetAllResult,
   SwapiPerson,
@@ -46,21 +47,21 @@ export async function getPersonById(id: number): Promise<Person> {
   return transformPerson(personData);
 }
 
-const getIdFromUrl = (url: string) =>
-  parseInt(
-    url
-      .substring(0, url.length - 1)
-      .split("/")
-      .at(-1) ?? "",
-    10
-  ) || 0;
-
 const fetchFilmTitlesForPerson = (person: Person, allFilmData: Film[]) => {
-  const filmIds = person.films.map((filmUrl) => getIdFromUrl(filmUrl));
   const filmTitles = allFilmData
-    .filter((filmData) => filmIds.includes(filmData.episodeId))
+    .filter((filmData) => person.films.includes(filmData.swapiUrl))
     .map((filmData) => filmData.title);
   person.films = filmTitles;
+  return person;
+};
+
+const fetchPlanetNamesForPerson = (person: Person, allPlanetData: Planet[]) => {
+  const planetName =
+    allPlanetData
+      .filter((planetData) => person.homeworld == planetData.swapiUrl)
+      .map((planetData) => planetData.name)
+      .at(0) || "None";
+  person.homeworld = planetName;
   return person;
 };
 
@@ -74,11 +75,11 @@ export async function getAllPeople(
   let people = data.results.map((personData) => transformPerson(personData));
   if (resolveDeps) {
     const allFilmData = (await getAllFilms()).result;
-    for (let i = 0; i < people.length; i++) {
-      fetchFilmTitlesForPerson(people[i], allFilmData);
-    }
-    people = people.map((person) =>
-      fetchFilmTitlesForPerson(person, allFilmData)
+    const allPlanetData = (await getAllPlanets()).result;
+    people = people.map(
+      (person) =>
+        fetchFilmTitlesForPerson(person, allFilmData) &&
+        fetchPlanetNamesForPerson(person, allPlanetData)
     );
   }
   return {
