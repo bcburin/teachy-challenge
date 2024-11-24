@@ -1,34 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import Table, { ColumnConfig } from "../components/Table";
 
 import { Person } from "@/app/api/entities/people";
+import React from "react";
 import { getAllPeople } from "@/app/api/entities/people";
+import { usePaginatedData } from "../hooks/usePaginatedData";
 
 const PeoplePage = () => {
-    const [people, setPeople] = useState<Person[] | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const data = await getAllPeople(currentPage, true);
-                setPeople(data.result);
-                setTotalPages(Math.ceil(data.count / data.result.length));
-            } catch (err) {
-                setError(`Failed to load data: ${err}`);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [currentPage]);
+    const { data: people, currentPage, totalPages, loading, error, setCurrentPage } = usePaginatedData<Person>(
+        (page) => getAllPeople(page, true)
+    );
 
     const columns: ColumnConfig<Person>[] = [
         { label: "Name", field: "name", width: "15%" },
@@ -38,7 +20,7 @@ const PeoplePage = () => {
         { label: "Mass", field: "mass", width: "5%", render: (value) => `${value} kg` },
         { label: "Homeworld", field: "homeworld", width: "10%" },
         { label: "Starships", field: "n_starships", width: "5%", render: (value) => value || "0" },
-        { label: "Movies", field: "films", width: "40%", render: (value) => Array.isArray(value) ? value.join(", ") : "None" }
+        { label: "Movies", field: "films", width: "40%", render: (value) => Array.isArray(value) ? value.join(", ") : "None" },
     ];
 
     if (error) return <div>Error: {error}</div>;
