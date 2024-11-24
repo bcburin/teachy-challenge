@@ -1,10 +1,9 @@
+import { Film, getAllFilms } from "./films";
 import {
   SwapiGetAllResult,
   SwapiPerson,
   fetchFromSwapi,
 } from "../apiClients/swapiClient";
-
-import { getFilmsByUrls } from "./films";
 
 export interface Person {
   name: string;
@@ -22,14 +21,7 @@ export interface Person {
   n_vehicles: number;
 }
 
-async function transformPerson(
-  personData: SwapiPerson,
-  resolveDeps: boolean
-): Promise<Person> {
-  const films = resolveDeps
-    ? (await getFilmsByUrls(personData.films)).map((film) => film.title)
-    : personData.films;
-
+function transformPerson(personData: SwapiPerson): Person {
   const transformedPerson: Person = {
     name: personData.name,
     birthYear: personData.birth_year,
@@ -40,7 +32,7 @@ async function transformPerson(
     mass: parseFloat(personData.mass) || 0,
     skinColor: personData.skin_color,
     homeworld: personData.homeworld,
-    films: films,
+    films: personData.films,
     n_species: personData.species.length,
     n_starships: personData.starships.length,
     n_vehicles: personData.vehicles.length,
@@ -49,13 +41,28 @@ async function transformPerson(
   return transformedPerson;
 }
 
-export async function getPersonById(
-  id: number,
-  resolveDeps: boolean = false
-): Promise<Person> {
+export async function getPersonById(id: number): Promise<Person> {
   const personData = await fetchFromSwapi<SwapiPerson>(`/people/${id}/`);
-  return transformPerson(personData, resolveDeps);
+  return transformPerson(personData);
 }
+
+const getIdFromUrl = (url: string) =>
+  parseInt(
+    url
+      .substring(0, url.length - 1)
+      .split("/")
+      .at(-1) ?? "",
+    10
+  ) || 0;
+
+const fetchFilmTitlesForPerson = (person: Person, allFilmData: Film[]) => {
+  const filmIds = person.films.map((filmUrl) => getIdFromUrl(filmUrl));
+  const filmTitles = allFilmData
+    .filter((filmData) => filmIds.includes(filmData.episodeId))
+    .map((filmData) => filmData.title);
+  person.films = filmTitles;
+  return person;
+};
 
 export async function getAllPeople(
   page: number,
@@ -64,9 +71,16 @@ export async function getAllPeople(
   const data = await fetchFromSwapi<SwapiGetAllResult<SwapiPerson>>(
     `/people/?page=${page}`
   );
-  const people = await Promise.all(
-    data.results.map((personData) => transformPerson(personData, resolveDeps))
-  );
+  let people = data.results.map((personData) => transformPerson(personData));
+  if (resolveDeps) {
+    const allFilmData = (await getAllFilms()).result;
+    for (let i = 0; i < people.length; i++) {
+      fetchFilmTitlesForPerson(people[i], allFilmData);
+    }
+    people = people.map((person) =>
+      fetchFilmTitlesForPerson(person, allFilmData)
+    );
+  }
   return {
     result: people,
     count: data.count,

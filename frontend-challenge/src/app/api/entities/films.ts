@@ -1,4 +1,8 @@
-import { SwapiFilm, fetchFromSwapi } from "../apiClients/swapiClient";
+import {
+  SwapiFilm,
+  SwapiGetAllResult,
+  fetchFromSwapi,
+} from "../apiClients/swapiClient";
 
 export interface Film {
   title: string;
@@ -14,9 +18,7 @@ export interface Film {
   species: string[];
 }
 
-export async function getFilmById(id: number): Promise<Film> {
-  const filmData = await fetchFromSwapi<SwapiFilm>(`/films/${id}/`);
-
+function transformFilm(filmData: SwapiFilm) {
   const transformedFilm: Film = {
     title: filmData.title,
     episodeId: filmData.episode_id,
@@ -34,25 +36,22 @@ export async function getFilmById(id: number): Promise<Film> {
   return transformedFilm;
 }
 
-export async function getFilmsByUrls(filmUrls: string[]) {
-  try {
-    const filmPromises = filmUrls.map((filmUrl) => {
-      const filmId =
-        parseInt(
-          filmUrl
-            .substring(0, filmUrl.length - 1)
-            .split("/")
-            .at(-1) ?? "",
-          10
-        ) || 0;
-      return getFilmById(filmId);
-    });
+export async function getFilmById(id: number): Promise<Film> {
+  const filmData = await fetchFromSwapi<SwapiFilm>(`/films/${id}/`);
 
-    const films = await Promise.all(filmPromises);
+  return transformFilm(filmData);
+}
 
-    return films;
-  } catch (error) {
-    console.error("Error fetching films:", error);
-    return [];
-  }
+export async function getAllFilms(): Promise<{
+  result: Film[];
+  count: number;
+}> {
+  const data = await fetchFromSwapi<SwapiGetAllResult<SwapiFilm>>(`/films/`);
+  const films = await Promise.all(
+    data.results.map((filmData) => transformFilm(filmData))
+  );
+  return {
+    result: films,
+    count: data.count,
+  };
 }
