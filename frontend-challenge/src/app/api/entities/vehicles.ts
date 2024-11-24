@@ -1,4 +1,8 @@
-import { SwapiVehicle, fetchFromSwapi } from "../apiClients/swapiClient";
+import {
+  SwapiGetAllResult,
+  SwapiVehicle,
+  fetchFromSwapi,
+} from "../apiClients/swapiClient";
 
 export interface Vehicle {
   name: string;
@@ -16,24 +20,42 @@ export interface Vehicle {
   pilots: string[];
 }
 
+function transform(data: SwapiVehicle): Vehicle {
+  return {
+    name: data.name,
+    model: data.model,
+    vehicleClass: data.vehicle_class,
+    manufacturer: data.manufacturer.split(", ").map((m) => m.trim()),
+    costInCredits: data.cost_in_credits,
+    length: data.length,
+    crew: data.crew,
+    passengers: data.passengers,
+    maxAtmospheringSpeed: data.max_atmosphering_speed,
+    cargoCapacity: data.cargo_capacity,
+    consumables: data.consumables,
+    films: data.films,
+    pilots: data.pilots,
+  };
+}
+
 export async function getVehicleById(id: number): Promise<Vehicle> {
   const vehicleData = await fetchFromSwapi<SwapiVehicle>(`/vehicles/${id}/`);
 
-  const transformedVehicle: Vehicle = {
-    name: vehicleData.name,
-    model: vehicleData.model,
-    vehicleClass: vehicleData.vehicle_class,
-    manufacturer: vehicleData.manufacturer.split(", ").map((m) => m.trim()),
-    costInCredits: vehicleData.cost_in_credits,
-    length: vehicleData.length,
-    crew: vehicleData.crew,
-    passengers: vehicleData.passengers,
-    maxAtmospheringSpeed: vehicleData.max_atmosphering_speed,
-    cargoCapacity: vehicleData.cargo_capacity,
-    consumables: vehicleData.consumables,
-    films: vehicleData.films,
-    pilots: vehicleData.pilots,
-  };
+  return transform(vehicleData);
+}
 
-  return transformedVehicle;
+export async function getAllVehicles(page: number): Promise<{
+  result: Vehicle[];
+  count: number;
+}> {
+  const data = await fetchFromSwapi<SwapiGetAllResult<SwapiVehicle>>(
+    `/vehicles/?page=${page}`
+  );
+  const vehicles = await Promise.all(
+    data.results.map((planetData) => transform(planetData))
+  );
+  return {
+    result: vehicles,
+    count: data.count,
+  };
 }

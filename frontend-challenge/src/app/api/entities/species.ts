@@ -1,4 +1,8 @@
-import { SwapiSpecies, fetchFromSwapi } from "../apiClients/swapiClient";
+import {
+  SwapiGetAllResult,
+  SwapiSpecies,
+  fetchFromSwapi,
+} from "../apiClients/swapiClient";
 
 export interface Species {
   name: string;
@@ -15,23 +19,41 @@ export interface Species {
   films: string[];
 }
 
+function transform(data: SwapiSpecies): Species {
+  return {
+    name: data.name,
+    classification: data.classification,
+    designation: data.designation,
+    averageHeight: data.average_height,
+    averageLifespan: data.average_lifespan,
+    hairColors: data.hair_colors.split(", ").map((h) => h.trim()),
+    eyeColors: data.eye_colors.split(", ").map((e) => e.trim()),
+    skinColors: data.skin_colors.split(", ").map((s) => s.trim()),
+    language: data.language,
+    homeworld: data.homeworld,
+    people: data.people,
+    films: data.films,
+  };
+}
+
 export async function getSpeciesById(id: number): Promise<Species> {
   const speciesData = await fetchFromSwapi<SwapiSpecies>(`/species/${id}/`);
 
-  const transformedSpecies: Species = {
-    name: speciesData.name,
-    classification: speciesData.classification,
-    designation: speciesData.designation,
-    averageHeight: speciesData.average_height,
-    averageLifespan: speciesData.average_lifespan,
-    hairColors: speciesData.hair_colors.split(", ").map((h) => h.trim()),
-    eyeColors: speciesData.eye_colors.split(", ").map((e) => e.trim()),
-    skinColors: speciesData.skin_colors.split(", ").map((s) => s.trim()),
-    language: speciesData.language,
-    homeworld: speciesData.homeworld,
-    people: speciesData.people,
-    films: speciesData.films,
-  };
+  return transform(speciesData);
+}
 
-  return transformedSpecies;
+export async function getAllSpecies(page: number): Promise<{
+  result: Species[];
+  count: number;
+}> {
+  const data = await fetchFromSwapi<SwapiGetAllResult<SwapiSpecies>>(
+    `/species/?page=${page}`
+  );
+  const species = await Promise.all(
+    data.results.map((speciesData) => transform(speciesData))
+  );
+  return {
+    result: species,
+    count: data.count,
+  };
 }
